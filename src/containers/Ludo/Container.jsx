@@ -17,7 +17,8 @@ import {
 import styles from "./Container.module.css";
 import { Base } from "../Base/Container";
 import { BOARD_SIZE } from "../../globalConstants";
-import { ContextMenu } from "../../services/contextMenu/components/ContextMenu";
+import { ContextMenu } from "../../services/contextMenu/Container";
+// import { ContextMenu } from "../../services/contextMenu/components/ContextMenu";
 
 const mapStateToProps = createStructuredSelector({
   bases: basesSelector,
