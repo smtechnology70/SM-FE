@@ -22,28 +22,51 @@ const mapDispatchToProps = {
 };
 
 class DiceBare extends React.PureComponent {
+  state = {
+    isRolling: false,
+    rollingValue: null,
+  };
+
+  handleDieClick = () => {
+    if (!this.props.isDieRollAllowed || this.state.isRolling) return;
+    this.setState({ isRolling: true });
+    this.rollingInterval = setInterval(() => {
+      // Show random value between 1 and 6
+      const randomValue = Math.floor(Math.random() * 6) + 1;
+      this.setState({ rollingValue: randomValue });
+    }, 100);
+    setTimeout(() => {
+      clearInterval(this.rollingInterval);
+      this.setState({ isRolling: false, rollingValue: null });
+      this.props.rollDie();
+    }, 2000);
+  };
+
   render() {
     const { baseColor } = this.props;
-    const dieClassNames = this.props.isDieRollAllowed
-      ? styles.Die
-      : [styles.Die, styles.Disabled];
+    const dieClassNames =
+      this.props.isDieRollAllowed && !this.state.isRolling
+        ? styles.Die
+        : [styles.Die, styles.Disabled];
+    const displayValue = this.state.isRolling
+      ? this.state.rollingValue || 1
+      : this.props.currentDieRoll;
     return (
       <div className={styles.Container}>
         <div
           className={classnames(dieClassNames)}
           style={getStyleObject(DICE_SIZE, DICE_SIZE, baseColor)}
-          onClick={() => this.props.rollDie()}
+          onClick={this.handleDieClick}
         >
-          {this.renderDots()}
+          {this.renderDots(displayValue)}
         </div>
       </div>
     );
   }
 
-  renderDots = () => {
+  renderDots = (value) => {
     const elements = [];
-    const configurationForCurrentRoll =
-      CONFIGURATIONS[this.props.currentDieRoll];
+    const configurationForCurrentRoll = CONFIGURATIONS[value];
 
     for (let i = 0; i < configurationForCurrentRoll.length; i++) {
       const isVisible = Boolean(configurationForCurrentRoll[i]);
@@ -55,6 +78,12 @@ class DiceBare extends React.PureComponent {
 
     return elements;
   };
+
+  componentWillUnmount() {
+    if (this.rollingInterval) {
+      clearInterval(this.rollingInterval);
+    }
+  }
 }
 
 export const Dice = connect(mapStateToProps, mapDispatchToProps)(DiceBare);
