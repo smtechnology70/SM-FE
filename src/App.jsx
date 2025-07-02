@@ -1,10 +1,15 @@
+import { Route, Routes } from "react-router";
 import "./App.css";
-import { Ludo } from "./containers/Ludo/Container";
+import Index from "./box-open/Index";
+import { Ludo } from "./ludo/containers/Ludo/Container";
 
 function App() {
   return (
     <>
-      <Ludo />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/users" element={<Ludo />} />
+      </Routes>
     </>
   );
 }
