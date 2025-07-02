@@ -1,150 +1,104 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./main.css";
-import { generateBoxes } from "./utils/generateBoxes";
-import clickSound from "./utils/sounds/click.mp3";
-import winSound from "./utils/sounds/win.mp3";
-import loseSound from "./utils/sounds/lose.mp3";
+import { buildConnection } from "./signalR";
+import clickMp3 from "./utils/sounds/click.mp3";
+import loseMp3 from "./utils/sounds/lose.mp3";
+import winMp3 from "./utils/sounds/win.mp3";
+import { STATUS_MAP } from "./constant";
 
-const Index = () => {
-  const [boxes, setBoxes] = useState(generateBoxes());
-  const [currentPlayer, setCurrentPlayer] = useState(1);
-  const [gameOver, setGameOver] = useState(false);
-  const [winner, setWinner] = useState(null);
-  const [player1, setPlayer1] = useState("");
-  const [player2, setPlayer2] = useState("");
-  const [playersSet, setPlayersSet] = useState(false);
-  const [playbackRate, setPlaybackRate] = React.useState(0.75);
-  // Adjust playback rate for click sound
-  //   const [playClick] = useSound(clickSound, {
-  //     // playbackRate,
-  //     // interrupt: true,
-  //     volume: 0.5,
-  //     preload: false,
-  //   });
-  //   const [playWin] = useSound(winSound, {
-  //     // playbackRate,
-  //     // interrupt: true,
-  //     volume: 0.5,
-  //     preload: false,
-  //   });
-  //   const [playLose] = useSound(loseSound, {
-  //     // playbackRate,
-  //     // interrupt: true,
-  //     volume: 0.5,
-  //     preload: false,
-  //   });
+const audio = {
+  click: new Audio(clickMp3),
+  win: new Audio(winMp3),
+  lose: new Audio(loseMp3),
+};
 
-  const clickAudio = useRef(new Audio(clickSound));
-  const winAudio = useRef(new Audio(winSound));
-  const loseAudio = useRef(new Audio(loseSound));
+export default function OnlineGame() {
+  const [conn] = useState(buildConnection);
+  const [gameId, setId] = useState("ROOM1"); // could be random / form input
+  const [player, setP] = useState(1); // 1 or 2 (radio/select)
+  const [state, setState] = useState(null); // GameState from server
+  const [connected, setConnected] = useState(false);
 
+  // -- establish hub connection once  --
   useEffect(() => {
-    clickAudio.current.volume = 0.5;
-    winAudio.current.volume = 0.5;
-    loseAudio.current.volume = 0.5;
+    if (conn.state === "Disconnected") {
+      conn
+        .start()
+        .then(() => {
+          console.log("Connected to SignalR");
+          conn.invoke("JoinGame", gameId, player);
+        })
+        .catch((err) => console.error("SignalR connection error", err));
+    }
+
+    conn.on("State", (s) => {
+      console.log("State changed:", s);
+      setState(s);
+    });
+    return () => {
+      conn.off("State");
+      conn.stop(); // optional cleanup
+    };
   }, []);
 
+  // -- join a game after connection ready --
   useEffect(() => {
-    if (gameOver && winner !== null) {
-      winAudio.current.currentTime = 0;
-      winAudio.current.play();
+    if (!connected && conn.state === "Disconnected") {
+      conn.start().then(() => {
+        setConnected(true);
+        conn.invoke("JoinGame", gameId, player);
+      });
     }
-  }, [gameOver, winner]);
+  }, [conn, connected]);
 
-  const handleBoxClick = (index) => {
-    if (gameOver || boxes[index].revealed) return;
+  // -- play win sound when game ends --
+  useEffect(() => {
+    if (state?.status === "Finished") audio.win.play();
+  }, [state?.status]);
 
-    const updatedBoxes = [...boxes];
-    updatedBoxes[index].revealed = true;
-    setBoxes(updatedBoxes);
+  const handleClick = (idx) => {
+    console.log("Box clicked:", idx);
+    if (!state) return;
+    if (STATUS_MAP[state.status] !== "Playing") return;
+    if (state.currentPlayer !== player) return;
+    if (state.boxes[idx].revealed) return;
 
-    clickAudio.current.currentTime = 0;
-    clickAudio.current.play();
-
-    if (updatedBoxes[index].value === 0) {
-      loseAudio.current.currentTime = 0;
-      loseAudio.current.play();
-      setGameOver(true);
-      setWinner(currentPlayer === 1 ? 2 : 1);
-    } else {
-      setCurrentPlayer((prev) => (prev === 1 ? 2 : 1));
-    }
+    audio.click.currentTime = 0;
+    audio.click.play();
+    conn.invoke("Move", gameId, player, idx);
   };
 
-  const resetGame = () => {
-    winAudio.current.pause();
-    loseAudio.current.pause();
-    setBoxes(generateBoxes());
-    setCurrentPlayer(1);
-    setGameOver(false);
-    setWinner(null);
-  };
+  if (!state) return <p>Connecting / joining…</p>;
 
   return (
     <div className="app">
-      {playersSet && (
-        <div className="player-info">
-          <span className={currentPlayer === 1 ? "active" : ""}>{player1}</span>
-          <span>vs</span>
-          <span className={currentPlayer === 2 ? "active" : ""}>{player2}</span>
-        </div>
-      )}
-      <div className="game-status">
-        {gameOver ? (
-          <h2>🏆 {winner === 1 ? player1 : player2} wins!</h2>
-        ) : (
-          <p>🎯 {currentPlayer === 1 ? player1 : player2}'s turn</p>
-        )}
-      </div>
-      {/* {!playersSet ? (
-        <div className="name-entry">
-          <input
-            placeholder="Player 1 Name"
-            onChange={(e) => setPlayer1(e.target.value)}
-          />
-          <input
-            placeholder="Player 2 Name"
-            onChange={(e) => setPlayer2(e.target.value)}
-          />
-          <button onClick={() => setPlayersSet(true)}>Start Game</button>
-        </div>
-      ) : (
-        <>
-          <h1>💥 Zero Trap</h1>
-          <p>
-            {gameOver
-              ? `${currentPlayer === 1 ? player2 : player1} wins!`
-              : `${currentPlayer === 1 ? player1 : player2}'s turn`}
-          </p>
-        </>
-      )} */}
+      <h3>
+        Game ID: <code>{gameId}</code>
+      </h3>
+
+      <p>
+        {STATUS_MAP[state.status] === "Playing"
+          ? `Turn: Player ${state.currentPlayer}`
+          : `Winner: Player ${state.winner}`}
+      </p>
+
       <div className="grid">
-        {boxes.map((box, index) => (
+        {state.boxes.map((b, i) => (
           <button
-            key={box.id}
-            className={`box ${box.revealed ? "revealed" : ""} ${
-              box.value === 0 && box.revealed ? "zero-box" : ""
+            key={i}
+            className={`box ${b.revealed ? "revealed" : ""} ${
+              b.value === 0 && b.revealed ? "zero-box" : ""
             }`}
-            onClick={() => handleBoxClick(index)}
-            disabled={box.revealed || gameOver}
+            onClick={() => handleClick(i)}
+            disabled={b.revealed || STATUS_MAP[state.status] !== "Playing"}
           >
             <div className="box-inner">
               <div className="box-front">?</div>
-              <div className="box-back">{box.value}</div>
+              <div className="box-back">{b.revealed ? b.value : ""}</div>
             </div>
           </button>
         ))}
       </div>
-      {gameOver && (
-        <>
-          {/* {playWin()} */}
-          <button className="reset-btn" onClick={resetGame}>
-            🔄 Play Again
-          </button>
-        </>
-      )}
     </div>
   );
-};
-
-export default Index;
+}
