@@ -14,19 +14,31 @@ const audio = {
 
 export default function OnlineGame() {
   const [conn] = useState(buildConnection);
-  const [gameId, setId] = useState("ROOM1"); // could be random / form input
-  const [player, setP] = useState(1); // 1 or 2 (radio/select)
-  const [state, setState] = useState(null); // GameState from server
+  const [gameId, setGameId] = useState("ROOM1");
+  const [player, setPlayer] = useState(null); // player will be set after fetch
+  const [state, setState] = useState(null);
   const [connected, setConnected] = useState(false);
+
+  // Fetch player ID from backend
+  useEffect(() => {
+    fetch("http://localhost:5179/api/Auth/me", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Auth/me response:", data);
+        setPlayer(Number(data.userId)); // Ensure player is always a number
+      })
+      .catch(() => setPlayer(null));
+  }, []);
 
   // -- establish hub connection once  --
   useEffect(() => {
+    if (player == null) return; // Wait for player ID
     if (conn.state === "Disconnected") {
       conn
         .start()
         .then(() => {
-          console.log("Connected to SignalR");
-          conn.invoke("JoinGame", gameId, player);
+          console.log("Connected to SignalR, player:", player);
+          conn.invoke("JoinGame", gameId);
         })
         .catch((err) => console.error("SignalR connection error", err));
     }
@@ -39,14 +51,14 @@ export default function OnlineGame() {
       conn.off("State");
       conn.stop(); // optional cleanup
     };
-  }, []);
+  }, [player]);
 
   // -- join a game after connection ready --
   useEffect(() => {
     if (!connected && conn.state === "Disconnected") {
       conn.start().then(() => {
         setConnected(true);
-        conn.invoke("JoinGame", gameId, player);
+        conn.invoke("JoinGame", gameId);
       });
     }
   }, [conn, connected]);
@@ -65,7 +77,7 @@ export default function OnlineGame() {
 
     audio.click.currentTime = 0;
     audio.click.play();
-    conn.invoke("Move", gameId, player, idx);
+    conn.invoke("Move", gameId, idx);
   };
 
   if (!state) return <p>Connecting / joining…</p>;
