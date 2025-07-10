@@ -14,54 +14,61 @@ const audio = {
 
 export default function OnlineGame() {
   const [conn] = useState(buildConnection);
-  const [gameId, setGameId] = useState("ROOM1");
   const [player, setPlayer] = useState(null); // player will be set after fetch
   const [state, setState] = useState(null);
-  const [connected, setConnected] = useState(false);
+  const [matchmakingStatus, setMatchmakingStatus] = useState(null);
+  const [matchFound, setMatchFound] = useState(false);
+  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
 
   // Fetch player ID from backend
   useEffect(() => {
     fetch("http://localhost:5179/api/Auth/me", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Auth/me response:", data);
-        setPlayer(Number(data.userId)); // Ensure player is always a number
+        setPlayer(Number(data.userId));
       })
       .catch(() => setPlayer(null));
   }, []);
 
-  // -- establish hub connection once  --
+  // -- establish hub connection and matchmaking --
   useEffect(() => {
-    if (player == null) return; // Wait for player ID
+    if (player == null) return;
     if (conn.state === "Disconnected") {
       conn
         .start()
         .then(() => {
-          console.log("Connected to SignalR, player:", player);
-          conn.invoke("JoinGame", gameId);
+          conn.invoke("JoinMatchmaking");
         })
         .catch((err) => console.error("SignalR connection error", err));
     }
 
+    // Listen for game state updates
     conn.on("State", (s) => {
-      console.log("State changed:", s);
       setState(s);
     });
+    // Listen for matchmaking status
+    conn.on("MatchmakingStatus", (status) => {
+      setMatchmakingStatus(status);
+    });
+    // Listen for match found
+    conn.on("MatchFound", (gameInfo) => {
+      setMatchFound(true);
+      setMatchmakingStatus(null);
+      setOpponentDisconnected(false);
+    });
+    // Listen for opponent disconnect
+    conn.on("OpponentDisconnected", () => {
+      setOpponentDisconnected(true);
+    });
+
     return () => {
       conn.off("State");
-      conn.stop(); // optional cleanup
+      conn.off("MatchmakingStatus");
+      conn.off("MatchFound");
+      conn.off("OpponentDisconnected");
+      conn.stop();
     };
-  }, [player]);
-
-  // -- join a game after connection ready --
-  useEffect(() => {
-    if (!connected && conn.state === "Disconnected") {
-      conn.start().then(() => {
-        setConnected(true);
-        conn.invoke("JoinGame", gameId);
-      });
-    }
-  }, [conn, connected]);
+  }, [player, conn]);
 
   // -- play win sound when game ends --
   useEffect(() => {
@@ -69,31 +76,56 @@ export default function OnlineGame() {
   }, [state?.status]);
 
   const handleClick = (idx) => {
-    console.log("Box clicked:", idx);
     if (!state) return;
     if (STATUS_MAP[state.status] !== "Playing") return;
-    if (state.currentPlayer !== player) return;
+    if (
+      state.isPlayer1Turn
+        ? state.player1Id !== state.currentPlayerId
+        : state.player2Id !== state.currentPlayerId
+    )
+      return;
     if (state.boxes[idx].revealed) return;
-
     audio.click.currentTime = 0;
     audio.click.play();
-    conn.invoke("Move", gameId, idx);
+    conn.invoke("Move", idx); // No gameId needed
   };
 
-  if (!state) return <p>Connecting / joining…</p>;
+  if (opponentDisconnected)
+    return <p>Your opponent has disconnected. Waiting for a new match…</p>;
+
+  if (!matchFound) {
+    return (
+      <div className="app">
+        <h3>Matchmaking…</h3>
+        {matchmakingStatus ? (
+          <p>
+            {matchmakingStatus.message ||
+              `In queue… Position: ${matchmakingStatus.position || "?"}`}
+          </p>
+        ) : (
+          <p>Joining matchmaking queue…</p>
+        )}
+      </div>
+    );
+  }
+
+  if (!state) return <p>Waiting for game to start…</p>;
 
   return (
     <div className="app">
-      <h3>
-        Game ID: <code>{gameId}</code>
-      </h3>
-
+      <h3>Online Game</h3>
       <p>
-        {STATUS_MAP[state.status] === "Playing"
-          ? `Turn: Player ${state.currentPlayer}`
-          : `Winner: Player ${state.winner}`}
+        {state.isPlayer1Turn
+          ? state.player1Id === player
+            ? "Your turn"
+            : "Opponent's turn"
+          : state.player2Id === player
+          ? "Your turn"
+          : "Opponent's turn"}
       </p>
-
+      <p>{STATUS_MAP[state.status]}</p>
+      {console.log("State:", state)}
+      <p>{state?.winnerPlayerId === player ? "You win!" : "You lose!"}</p>
       <div className="grid">
         {state.boxes.map((b, i) => (
           <button
