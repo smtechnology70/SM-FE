@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { setTokens } from "./tokenService";
+import { API_BASE_URL } from "../constant";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ export default function Login() {
     setError("");
     try {
       const res = await axios.post(
-        "http://localhost:5179/api/Auth/login",
+        `${API_BASE_URL}/Auth/login`,
         { username, password },
         { withCredentials: true }
       );

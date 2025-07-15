@@ -1,8 +1,9 @@
 import * as signalR from "@microsoft/signalr";
+import { WS_BASE_URL } from "../constant";
 
 export const buildConnection = () =>
   new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5179/zero-blast", {
+    .withUrl(`${WS_BASE_URL}/zero-blast`, {
       withCredentials: true,
     })
     .withAutomaticReconnect()
