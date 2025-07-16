@@ -7,7 +7,7 @@ export const buildConnection = () => {
     .withUrl(`${WS_BASE_URL}/zero-blast`, {
       withCredentials: true,
       accessTokenFactory: getAccessToken,
-      transport: signalR.HttpTransportType.WebSockets,
+      // transport: signalR.HttpTransportType.WebSockets,
     })
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
