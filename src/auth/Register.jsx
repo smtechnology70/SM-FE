@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../constant";
+import { useState } from "react";
+import apiClient from "../utils/apiClient";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -13,10 +12,7 @@ export default function Register() {
     setError("");
     setSuccess("");
     try {
-      await axios.post(`${API_BASE_URL}/Auth/register`, {
-        username,
-        password,
-      });
+      await apiClient.post("/Auth/register", { username, password });
       setSuccess("Registration successful! You can now log in.");
       setUsername("");
       setPassword("");

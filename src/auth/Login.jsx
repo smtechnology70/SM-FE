@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import apiClient from "../utils/apiClient";
 import { setTokens } from "./tokenService";
-import { API_BASE_URL } from "../constant";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -12,11 +11,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/Auth/login`,
-        { username, password },
-        { withCredentials: true }
-      );
+      const res = await apiClient.post("/Auth/login", { username, password });
       setTokens(res.data);
       // redirect or update UI here, e.g. window.location = "/"
     } catch (err) {

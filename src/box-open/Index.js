@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import apiClient from "../utils/apiClient";
+import { STATUS_MAP } from "./constant";
 import "./main.css";
 import { buildConnection } from "./signalR";
 import clickMp3 from "./utils/sounds/click.mp3";
 import loseMp3 from "./utils/sounds/lose.mp3";
 import winMp3 from "./utils/sounds/win.mp3";
-import { STATUS_MAP } from "./constant";
-import { API_BASE_URL } from "../constant";
 
 const audio = {
   click: new Audio(clickMp3),
@@ -23,10 +23,10 @@ export default function OnlineGame() {
 
   // Fetch player ID from backend
   useEffect(() => {
-    fetch(`${API_BASE_URL}/Auth/me`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        setPlayer(Number(data.userId));
+    apiClient
+      .get("/Auth/me")
+      .then((res) => {
+        setPlayer(Number(res.data.userId));
       })
       .catch(() => setPlayer(null));
   }, []);

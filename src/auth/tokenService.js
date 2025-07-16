@@ -2,7 +2,11 @@ const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const ACCESS_TOKEN_EXP_KEY = "accessTokenExpiration";
 
-export function setTokens({ accessToken, refreshToken, accessTokenExpiration }) {
+export function setTokens({
+  accessToken,
+  refreshToken,
+  accessTokenExpiration,
+}) {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   localStorage.setItem(ACCESS_TOKEN_EXP_KEY, accessTokenExpiration);
