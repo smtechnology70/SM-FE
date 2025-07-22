@@ -1,11 +1,13 @@
 import { useState } from "react";
 import apiClient from "../utils/apiClient";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,7 +15,8 @@ export default function Register() {
     setSuccess("");
     try {
       await apiClient.post("/Auth/register", { username, password });
-      setSuccess("Registration successful! You can now log in.");
+      setSuccess("Registration successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1500);
       setUsername("");
       setPassword("");
     } catch (err) {
@@ -22,13 +25,14 @@ export default function Register() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Register</h2>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      {success && <div style={{ color: "green" }}>{success}</div>}
+    <form className="auth-form" onSubmit={handleSubmit}>
+      <h2 className="auth-title">Register</h2>
+      {error && <div className="auth-error">{error}</div>}
+      {success && <div className="auth-success">{success}</div>}
       <input
         type="text"
         placeholder="Username"
+        className="auth-input"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
@@ -36,11 +40,18 @@ export default function Register() {
       <input
         type="password"
         placeholder="Password"
+        className="auth-input"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <button type="submit">Register</button>
+      <button type="submit" className="auth-button">
+        Register
+      </button>
+      <p className="auth-switch">
+        Already have an account?{" "}
+        <span onClick={() => navigate("/login")}>Login</span>
+      </p>
     </form>
   );
 }

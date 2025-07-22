@@ -1,20 +1,36 @@
-import { Route, Routes } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import Index from "./box-open/Index";
 import { Ludo } from "./ludo/containers/Ludo/Container";
 import Register from "./auth/Register";
 import Login from "./auth/Login";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/ludo" element={<Ludo />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Index />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ludo"
+        element={
+          <ProtectedRoute>
+            <Ludo />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 

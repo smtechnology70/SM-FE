@@ -11,7 +11,10 @@ import { API_BASE_URL } from "../constant";
 // Refresh token logic
 async function refreshTokenIfNeeded() {
   const exp = getAccessTokenExpiration();
-  if (!exp || new Date(exp) > new Date()) return;
+
+  const buffer = 60 * 1000;
+  
+  if (!exp || new Date().getTime() < new Date(exp).getTime() - buffer) return;
 
   const refreshToken = getRefreshToken();
   if (!refreshToken) {
