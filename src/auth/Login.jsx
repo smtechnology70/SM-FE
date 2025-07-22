@@ -14,7 +14,13 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const res = await apiClient.post("/Auth/login", { username, password });
+      const res = await apiClient.post(
+        "/Auth/login",
+        { username, password },
+        {
+          skipAuth: true,
+        }
+      );
       setTokens(res.data);
       navigate("/");
     } catch (err) {

@@ -14,7 +14,13 @@ export default function Register() {
     setError("");
     setSuccess("");
     try {
-      await apiClient.post("/Auth/register", { username, password });
+      await apiClient.post(
+        "/Auth/register",
+        { username, password },
+        {
+          skipAuth: true,
+        }
+      );
       setSuccess("Registration successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 1500);
       setUsername("");
