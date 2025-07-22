@@ -49,6 +49,8 @@ export default function OnlineGame() {
     });
     // Listen for matchmaking status
     conn.on("MatchmakingStatus", (status) => {
+      console.log(status);
+      
       setMatchmakingStatus(status);
     });
     // Listen for match found
@@ -126,7 +128,9 @@ export default function OnlineGame() {
       </p>
       <p>{STATUS_MAP[state.status]}</p>
       {console.log("State:", state)}
-      <p>{state?.winnerPlayerId === player ? "You win!" : "You lose!"}</p>
+      {state?.winnerPlayerId != null && (
+        <p>{state.winnerPlayerId === player ? "You win!" : "You lose!"}</p>
+      )}
       <div className="grid">
         {state.boxes.map((b, i) => (
           <button
@@ -137,9 +141,9 @@ export default function OnlineGame() {
             onClick={() => handleClick(i)}
             disabled={b.revealed || STATUS_MAP[state.status] !== "Playing"}
           >
-            <div className="box-inner">
+            <div className="box-content">
               <div className="box-front">?</div>
-              <div className="box-back">{b.revealed ? b.value : ""}</div>
+              <div className="box-back">{b.value}</div>
             </div>
           </button>
         ))}
