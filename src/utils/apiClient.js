@@ -9,7 +9,7 @@ import {
 import { API_BASE_URL } from "../constant";
 
 // Refresh token logic
-async function refreshTokenIfNeeded() {
+export async function refreshTokenIfNeeded() {
   const exp = getAccessTokenExpiration();
   if (!exp || new Date(exp) > new Date()) return;
 
@@ -37,6 +37,11 @@ const apiClient = axios.create({
 
 // Request interceptor for token and refresh
 apiClient.interceptors.request.use(async (config) => {
+  if (config.skipAuth) {
+    delete config.skipAuth; // Remove skipAuth flag if present
+    return config; // Skip token handling
+  }
+  // Refresh token if needed
   await refreshTokenIfNeeded();
   const token = getAccessToken();
   if (token) {
