@@ -124,8 +124,8 @@ const DailyDigitGame = () => {
       // Fetch today's game data
       const response = await apiClient.get(`/DailyDigitGame/today`);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         setGameState(data);
         setDigitCounts(data.digitCounts || {});
         // Parse timeRemaining string to milliseconds if needed
@@ -148,9 +148,8 @@ const DailyDigitGame = () => {
         `/DailyDigitGame/recent-games`
       );
 
-      if (recentResponse.ok) {
-        const recentData = await recentResponse.json();
-        setRecentGames(recentData);
+      if (recentResponse.status === 200) {
+        setRecentGames(recentResponse.data || []);
       }
 
       // Fetch today's winners
@@ -158,8 +157,8 @@ const DailyDigitGame = () => {
         `/DailyDigitGame/winners/today`
       );
 
-      if (winnersResponse.ok) {
-        const winnersData = await winnersResponse.json();
+      if (winnersResponse.status === 200) {
+        const winnersData = winnersResponse.data || [];
         setWinners(winnersData);
       }
 
@@ -180,10 +179,10 @@ const DailyDigitGame = () => {
           selectedDigit: digit,
         });
 
-        if (response.ok) {
+        if (response.status === 200) {
           fetchInitialData(); // Refresh data
         } else {
-          const errorData = await response.json();
+          const errorData = response.data || {};
           setError(errorData.message || "Failed to submit digit");
         }
       }
