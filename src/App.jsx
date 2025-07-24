@@ -10,6 +10,7 @@ import { Navigate, Route, Routes } from "react-router";
 import DailyLottery from "./lottery/DailyLottery";
 import DailyDigitGame from "./minimumNumberCount/DailyDigitGame";
 // import Header from "./lottery/Header";
+import Dashboard from "./components/Dashboard"
 
 function App() {
   return (
@@ -21,6 +22,15 @@ function App() {
       {/* Protected Routes */}
       <Route
         path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/zeroblast"
         element={
           <ProtectedRoute>
             <ZeroBlast />

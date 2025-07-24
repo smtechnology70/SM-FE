@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.10.0",
     "classnames": "^2.5.1",
+    "framer-motion": "^12.23.9",
     "random-js": "^2.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
