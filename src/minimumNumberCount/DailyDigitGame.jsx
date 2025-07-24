@@ -122,11 +122,7 @@ const DailyDigitGame = () => {
       if (!token) return;
 
       // Fetch today's game data
-      const response = await apiClient.get(
-        `${
-          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
-        }/DailyDigitGame/today`
-      );
+      const response = await apiClient.get(`/DailyDigitGame/today`);
 
       if (response.ok) {
         const data = await response.json();
@@ -149,9 +145,7 @@ const DailyDigitGame = () => {
 
       // Fetch recent games
       const recentResponse = await apiClient.get(
-        `${
-          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
-        }/DailyDigitGame/recent-games`
+        `/DailyDigitGame/recent-games`
       );
 
       if (recentResponse.ok) {
@@ -161,9 +155,7 @@ const DailyDigitGame = () => {
 
       // Fetch today's winners
       const winnersResponse = await apiClient.get(
-        `${
-          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
-        }/DailyDigitGame/winners/today`
+        `/DailyDigitGame/winners/today`
       );
 
       if (winnersResponse.ok) {
@@ -184,12 +176,9 @@ const DailyDigitGame = () => {
       if (connection && connection.state === "Connected") {
         await connection.invoke("SubmitDigit", digit);
       } else {
-        const response = await apiClient.post(
-          `${
-            process.env.REACT_APP_API_BASE_URL || API_BASE_URL
-          }/DailyDigitGame/submit-digit`,
-          { selectedDigit: digit }
-        );
+        const response = await apiClient.post(`/DailyDigitGame/submit-digit`, {
+          selectedDigit: digit,
+        });
 
         if (response.ok) {
           fetchInitialData(); // Refresh data
