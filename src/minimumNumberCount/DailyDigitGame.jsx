@@ -27,8 +27,8 @@ const DailyDigitGame = () => {
 
     // Setup timer for countdown
     const timer = setInterval(() => {
-      if (gameState?.timeRemaining) {
-        updateTimeRemaining();
+      if (typeof timeRemaining === "number" && timeRemaining > 0) {
+        setTimeRemaining((prev) => Math.max(prev - 1000, 0));
       }
     }, 1000);
 
@@ -63,7 +63,19 @@ const DailyDigitGame = () => {
         console.log("Received game state:", state);
         setGameState(state);
         setDigitCounts(state.digitCounts || {});
-        setTimeRemaining(state.timeRemaining);
+        // Parse timeRemaining string to milliseconds if needed
+        let ms = 0;
+        if (typeof state.timeRemaining === "string") {
+          const [timePart, msPart] = state.timeRemaining.split(".");
+          const [h, m, s] = timePart.split(":");
+          ms = +h * 3600 * 1000 + +m * 60 * 1000 + +s * 1000;
+          if (msPart) {
+            ms += parseInt(msPart.slice(0, 3).padEnd(3, "0"));
+          }
+        } else if (typeof state.timeRemaining === "number") {
+          ms = state.timeRemaining;
+        }
+        setTimeRemaining(ms);
         setLoading(false);
       });
 
@@ -119,7 +131,19 @@ const DailyDigitGame = () => {
         const data = await response.json();
         setGameState(data);
         setDigitCounts(data.digitCounts || {});
-        setTimeRemaining(data.timeRemaining);
+        // Parse timeRemaining string to milliseconds if needed
+        let ms = 0;
+        if (typeof data.timeRemaining === "string") {
+          const [timePart, msPart] = data.timeRemaining.split(".");
+          const [h, m, s] = timePart.split(":");
+          ms = +h * 3600 * 1000 + +m * 60 * 1000 + +s * 1000;
+          if (msPart) {
+            ms += parseInt(msPart.slice(0, 3).padEnd(3, "0"));
+          }
+        } else if (typeof data.timeRemaining === "number") {
+          ms = data.timeRemaining;
+        }
+        setTimeRemaining(ms);
       }
 
       // Fetch recent games
@@ -194,19 +218,15 @@ const DailyDigitGame = () => {
     }
   };
 
-  const updateTimeRemaining = () => {
-    if (!gameState?.timeRemaining) return;
+  const formatTimeRemaining = (millisecondsParam) => {
+    let milliseconds = millisecondsParam;
 
-    const now = new Date();
-    const endOfDay = new Date(now);
-    endOfDay.setDate(endOfDay.getDate() + 1);
-    endOfDay.setHours(0, 0, 0, 0);
+    if (typeof millisecondsParam === "string") {
+      const [h, m, s] = millisecondsParam.split(":");
+      console.log("Parsing time string:", h, m, s);
+      milliseconds = +h * 3600 * 1000 + +m * 60 * 1000 + parseFloat(s) * 1000;
+    }
 
-    const remaining = endOfDay - now;
-    setTimeRemaining(remaining);
-  };
-
-  const formatTimeRemaining = (milliseconds) => {
     if (!milliseconds || milliseconds <= 0) return "00:00:00";
 
     const totalSeconds = Math.floor(milliseconds / 1000);
