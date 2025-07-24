@@ -7,7 +7,7 @@ export const buildConnection = () => {
   refreshTokenIfNeeded();
 
   return new signalR.HubConnectionBuilder()
-    .withUrl(`${WS_BASE_URL}/zero-blast`, {
+    .withUrl(`${process.env.REACT_APP_WS_BASE_URL || WS_BASE_URL}/zero-blast`, {
       withCredentials: true,
       accessTokenFactory: getAccessToken,
     })

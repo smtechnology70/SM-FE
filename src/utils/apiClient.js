@@ -19,9 +19,12 @@ export async function refreshTokenIfNeeded() {
     throw new Error("No refresh token");
   }
 
-  const res = await axios.post(`${API_BASE_URL}/Auth/refresh`, {
-    refreshToken,
-  });
+  const res = await axios.post(
+    `${process.env.REACT_APP_API_BASE_URL || API_BASE_URL}/Auth/refresh`,
+    {
+      refreshToken,
+    }
+  );
   if (res.status !== 200) {
     clearTokens();
     throw new Error("Refresh failed");
@@ -31,7 +34,7 @@ export async function refreshTokenIfNeeded() {
 
 // Generic API client
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: process.env.REACT_APP_API_BASE_URL || API_BASE_URL,
   withCredentials: true,
 });
 
