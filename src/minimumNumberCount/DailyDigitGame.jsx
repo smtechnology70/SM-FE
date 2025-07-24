@@ -1,16 +1,16 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import "./DailyDigitGame.css";
-import { API_BASE_URL, WS_BASE_URL } from "../constant";
 import { getAccessToken } from "../auth/tokenService";
-import { refreshTokenIfNeeded } from "../utils/apiClient";
+import apiClient, { refreshTokenIfNeeded } from "../utils/apiClient";
+import { API_BASE_URL, WS_BASE_URL } from "../constant";
 
 const DailyDigitGame = () => {
   const [gameState, setGameState] = useState(null);
   const [connection, setConnection] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(24000000); // 24 hours in milliseconds
   const [digitCounts, setDigitCounts] = useState({});
   const [winners, setWinners] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
@@ -18,16 +18,13 @@ const DailyDigitGame = () => {
   const userSelectedDigit = gameState?.playerSelectedDigit;
   const hasUserSelected = gameState?.hasPlayerEntered;
 
-  // Get auth token from localStorage
-  const getAuthToken = () => localStorage.getItem("authToken");
-
   useEffect(() => {
     setupSignalRConnection();
     fetchInitialData();
 
     // Setup timer for countdown
     const timer = setInterval(() => {
-      if (typeof timeRemaining === "number" && timeRemaining > 0) {
+      if (timeRemaining > 0) {
         setTimeRemaining((prev) => Math.max(prev - 1000, 0));
       }
     }, 1000);
@@ -51,10 +48,15 @@ const DailyDigitGame = () => {
       refreshTokenIfNeeded();
 
       const newConnection = new HubConnectionBuilder()
-        .withUrl(`${WS_BASE_URL}/dailyDigitGameHub`, {
-          withCredentials: true,
-          accessTokenFactory: getAccessToken,
-        })
+        .withUrl(
+          `${
+            process.env.REACT_APP_WS_BASE_URL || WS_BASE_URL
+          }/dailyDigitGameHub`,
+          {
+            withCredentials: true,
+            accessTokenFactory: getAccessToken,
+          }
+        )
         .withAutomaticReconnect()
         .build();
 
@@ -116,16 +118,15 @@ const DailyDigitGame = () => {
 
   const fetchInitialData = async () => {
     try {
-      const token = getAuthToken();
+      const token = getAccessToken();
       if (!token) return;
 
       // Fetch today's game data
-      const response = await fetch(`${API_BASE_URL}/DailyDigitGame/today`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiClient.get(
+        `${
+          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
+        }/DailyDigitGame/today`
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -147,14 +148,10 @@ const DailyDigitGame = () => {
       }
 
       // Fetch recent games
-      const recentResponse = await fetch(
-        `${API_BASE_URL}/DailyDigitGame/recent-games`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const recentResponse = await apiClient.get(
+        `${
+          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
+        }/DailyDigitGame/recent-games`
       );
 
       if (recentResponse.ok) {
@@ -163,14 +160,10 @@ const DailyDigitGame = () => {
       }
 
       // Fetch today's winners
-      const winnersResponse = await fetch(
-        `${API_BASE_URL}/DailyDigitGame/winners/today`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const winnersResponse = await apiClient.get(
+        `${
+          process.env.REACT_APP_API_BASE_URL || API_BASE_URL
+        }/DailyDigitGame/winners/today`
       );
 
       if (winnersResponse.ok) {
@@ -191,18 +184,11 @@ const DailyDigitGame = () => {
       if (connection && connection.state === "Connected") {
         await connection.invoke("SubmitDigit", digit);
       } else {
-        // Fallback to HTTP API
-        const token = getAuthToken();
-        const response = await fetch(
-          `${API_BASE_URL}/DailyDigitGame/submit-digit`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ selectedDigit: digit }),
-          }
+        const response = await apiClient.post(
+          `${
+            process.env.REACT_APP_API_BASE_URL || API_BASE_URL
+          }/DailyDigitGame/submit-digit`,
+          { selectedDigit: digit }
         );
 
         if (response.ok) {

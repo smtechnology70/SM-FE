@@ -22,6 +22,7 @@ export default function Login() {
         }
       );
       setTokens(res.data);
+      localStorage.setItem("username", username);
       navigate("/");
     } catch (err) {
       setError("Login failed. Please check your credentials.");

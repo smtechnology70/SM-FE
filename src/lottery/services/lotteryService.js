@@ -18,9 +18,12 @@ class SignalRService {
     refreshTokenIfNeeded();
 
     this.connection = new HubConnectionBuilder()
-      .withUrl(`${WS_BASE_URL}/daily-number-game`, {
-        accessTokenFactory: () => token,
-      })
+      .withUrl(
+        `${process.env.REACT_APP_WS_BASE_URL || WS_BASE_URL}/daily-number-game`,
+        {
+          accessTokenFactory: () => token,
+        }
+      )
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
