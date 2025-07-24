@@ -1,5 +1,6 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { WS_BASE_URL } from "../../constant";
+import { refreshTokenIfNeeded } from "../../utils/apiClient";
 
 class SignalRService {
   constructor() {
@@ -13,6 +14,8 @@ class SignalRService {
     if (!token) {
       throw new Error("No access token available");
     }
+
+    refreshTokenIfNeeded();
 
     this.connection = new HubConnectionBuilder()
       .withUrl(`${WS_BASE_URL}/daily-number-game`, {

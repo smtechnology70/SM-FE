@@ -8,6 +8,8 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import { SingleGameProvider } from "./single-open/contexts/singleGameContext";
 import { Navigate, Route, Routes } from "react-router";
 import DailyLottery from "./lottery/DailyLottery";
+import DailyDigitGame from "./minimumNumberCount/DailyDigitGame";
+// import Header from "./lottery/Header";
 
 function App() {
   return (
@@ -47,6 +49,7 @@ function App() {
         path="/lottery"
         element={
           <ProtectedRoute>
+            {/* <Header /> */}
             <DailyLottery />
           </ProtectedRoute>
         }
@@ -55,7 +58,16 @@ function App() {
         path="/history"
         element={
           <ProtectedRoute>
+            {/* <Header /> */}
             <DailyLottery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dailyDigitGame"
+        element={
+          <ProtectedRoute>
+            <DailyDigitGame />
           </ProtectedRoute>
         }
       />
