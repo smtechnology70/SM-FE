@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./DailyDigitGame.css";
 import { getAccessToken } from "../auth/tokenService";
 import apiClient, { refreshTokenIfNeeded } from "../utils/apiClient";
-import { API_BASE_URL, WS_BASE_URL } from "../constant";
+import { WS_BASE_URL } from "../constant";
 
 const DailyDigitGame = () => {
   const [gameState, setGameState] = useState(null);
@@ -11,7 +11,6 @@ const DailyDigitGame = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(24000000); // 24 hours in milliseconds
-  const [digitCounts, setDigitCounts] = useState({});
   const [winners, setWinners] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
 
@@ -64,7 +63,6 @@ const DailyDigitGame = () => {
       newConnection.on("GameState", (state) => {
         console.log("Received game state:", state);
         setGameState(state);
-        setDigitCounts(state.digitCounts || {});
         // Parse timeRemaining string to milliseconds if needed
         let ms = 0;
         if (typeof state.timeRemaining === "string") {
@@ -89,7 +87,7 @@ const DailyDigitGame = () => {
 
       newConnection.on("GameStatistics", (stats) => {
         console.log("Game statistics updated:", stats);
-        setDigitCounts(stats.digitCounts || {});
+        setGameState({ ...gameState, ...stats });
       });
 
       newConnection.on("TodaysWinners", (winnersList) => {
@@ -127,7 +125,6 @@ const DailyDigitGame = () => {
       if (response.status === 200) {
         const data = response.data;
         setGameState(data);
-        setDigitCounts(data.digitCounts || {});
         // Parse timeRemaining string to milliseconds if needed
         let ms = 0;
         if (typeof data.timeRemaining === "string") {
@@ -214,13 +211,16 @@ const DailyDigitGame = () => {
   };
 
   const getDigitPopularity = (digit) => {
-    const count = digitCounts[digit] || 0;
-    const total = Object.values(digitCounts).reduce((sum, c) => sum + c, 0);
+    const count = gameState?.digitCounts[digit] || 0;
+    const total = Object.values(gameState?.digitCounts || {}).reduce(
+      (sum, c) => sum + c,
+      0
+    );
     return total > 0 ? (count / total) * 100 : 0;
   };
 
   const getLowestCountDigits = () => {
-    const counts = Object.entries(digitCounts).filter(
+    const counts = Object.entries(gameState?.digitCounts || {}).filter(
       ([_, count]) => count > 0
     );
     if (counts.length === 0) return [];
@@ -340,11 +340,13 @@ const DailyDigitGame = () => {
                     }`}
                     onClick={() => confirmDigitSelection(digit)}
                     title={`${
-                      digitCounts[digit] || 0
+                      gameState?.digitCounts[digit] || 0
                     } players selected this digit`}
                   >
                     <span className="digit">{digit}</span>
-                    <span className="count">{digitCounts[digit] || 0}</span>
+                    <span className="count">
+                      {gameState?.digitCounts[digit] || 0}
+                    </span>
                     <div
                       className="popularity-bar"
                       style={{ width: `${getDigitPopularity(digit)}%` }}
@@ -450,7 +452,9 @@ const DailyDigitGame = () => {
                     }}
                   ></div>
                   <span className="digit-label">{digit}</span>
-                  <span className="count-label">{digitCounts[digit] || 0}</span>
+                  <span className="count-label">
+                    {gameState?.digitCounts[digit] || 0}
+                  </span>
                 </div>
               ))}
             </div>
