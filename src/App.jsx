@@ -6,7 +6,10 @@ import Register from "./auth/Register";
 import Login from "./auth/Login";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import { SingleGameProvider } from "./single-open/contexts/singleGameContext";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
+import DailyLottery from "./lottery/DailyLottery";
+import DailyDigitGame from "./minimumNumberCount/DailyDigitGame";
+// import Header from "./lottery/Header";
 
 function App() {
   return (
@@ -35,11 +38,40 @@ function App() {
       <Route
         path="/single"
         element={
-          <SingleGameProvider>
-            <SingleBox />
-          </SingleGameProvider>
+          <ProtectedRoute>
+            <SingleGameProvider>
+              <SingleBox />
+            </SingleGameProvider>
+          </ProtectedRoute>
         }
       />
+      <Route
+        path="/lottery"
+        element={
+          <ProtectedRoute>
+            {/* <Header /> */}
+            <DailyLottery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute>
+            {/* <Header /> */}
+            <DailyLottery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dailyDigitGame"
+        element={
+          <ProtectedRoute>
+            <DailyDigitGame />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
