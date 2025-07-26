@@ -81,24 +81,30 @@ const DailyLottery = () => {
     };
   }, [handleGameState, handleGuessSubmitted, handleNewWinner, handleError]);
 
-  // Timer for time remaining
+  // Timer for time remaining (using gameState?.timeRemaining as a string like 'HH:mm:ss.SSSSSSS')
   useEffect(() => {
     if (gameState?.timeRemaining) {
-      const interval = setInterval(() => {
-        const now = new Date();
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
-        const remaining = endOfDay - now;
+      // Parse the time string 'HH:mm:ss.SSSSSSS'
+      const [hms, ms] = gameState.timeRemaining.split(".");
+      const [hours, minutes, seconds] = hms.split(":").map(Number);
+      let totalMs =
+        (hours * 60 * 60 + minutes * 60 + seconds) * 1000 +
+        (ms ? parseInt(ms.slice(0, 3)) : 0);
 
-        if (remaining > 0) {
-          const hours = Math.floor(remaining / (1000 * 60 * 60));
-          const minutes = Math.floor(
-            (remaining % (1000 * 60 * 60)) / (1000 * 60)
+      const interval = setInterval(() => {
+        if (totalMs > 0) {
+          const displayHours = Math.floor(totalMs / (1000 * 60 * 60));
+          const displayMinutes = Math.floor(
+            (totalMs % (1000 * 60 * 60)) / (1000 * 60)
           );
-          const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-          setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
+          const displaySeconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+          setTimeRemaining(
+            `${displayHours}h ${displayMinutes}m ${displaySeconds}s`
+          );
+          totalMs -= 1000;
         } else {
           setTimeRemaining("Game ended");
+          clearInterval(interval);
         }
       }, 1000);
 
@@ -109,6 +115,7 @@ const DailyLottery = () => {
   const loadGameData = async () => {
     try {
       const response = await dailyNumberService.getTodaysGame();
+      console.log("Game data loaded:", response.data);
       setGameState(response.data);
     } catch (error) {
       console.error("Failed to load game data:", error);
