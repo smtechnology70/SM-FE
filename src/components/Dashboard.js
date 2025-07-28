@@ -35,6 +35,23 @@ const Dashboard = () => {
       bgColor: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
       stats: { players: "8.2K", rating: 4.5 },
     },
+    {
+      id: "daily-number-lottery",
+      title: "Daily Number Lottery",
+      description: "Guess a number between 0-99 and win big!",
+      icon: "🎰",
+      bgColor: "linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)",
+      stats: { players: "15.3K", rating: 4.7 },
+    },
+    {
+      id: "daily-digit-game",
+      title: "Daily Digit Game",
+      description:
+        "Choose a digit from 0-9. The digit selected by the fewest players wins!",
+      icon: "🔟",
+      bgColor: "linear-gradient(135deg, #00CDAC 0%, #02AAB0 100%)",
+      stats: { players: "11.6K", rating: 4.6 },
+    },
   ];
 
   const openGame = (gameId) => {
@@ -50,13 +67,19 @@ const Dashboard = () => {
     const timer = setTimeout(() => {
       switch (activeGame) {
         case "box-open":
-          navigate("/box-open");
+          navigate("/zeroblast");
           break;
         case "ludo":
           navigate("/ludo");
           break;
         case "single-open":
           navigate("/single");
+          break;
+        case "daily-number-lottery":
+          navigate("/lottery");
+          break;
+        case "daily-digit-game":
+          navigate("/dailyDigitGame");
           break;
         default:
           break;
@@ -134,6 +157,8 @@ const Dashboard = () => {
                   <div className="dashboard-floating-game">📦</div>
                   <div className="dashboard-floating-game">🎲</div>
                   <div className="dashboard-floating-game">🎯</div>
+                  <div className="dashboard-floating-game">🎰</div>
+                  <div className="dashboard-floating-game">🔟</div>
                 </div>
               </motion.div>
             </section>
