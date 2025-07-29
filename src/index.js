@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { store } from "./ludo/state/store";
 import { BrowserRouter } from "react-router";
@@ -12,7 +13,9 @@ root.render(
   // <React.StrictMode>
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <QueryClientProvider client={new QueryClient()}>
+        <App />
+      </QueryClientProvider>
     </BrowserRouter>
   </Provider>
   // </React.StrictMode>
