@@ -5,13 +5,13 @@ import { useNavigate } from "react-router";
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState([]);
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError([]);
     setSuccess("");
     try {
       await apiClient.post(
@@ -26,14 +26,26 @@ export default function Register() {
       setUsername("");
       setPassword("");
     } catch (err) {
-      setError("Registration failed. Please try a different username.");
+      setError(
+        Object.values(err?.response?.data?.errors || {}).join(", ") || [
+          "Registration failed. Please try a different username.",
+        ]
+      );
     }
   };
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2 className="auth-title">Register</h2>
-      {error && <div className="auth-error">{error}</div>}
+      {error.length > 0 && (
+        <div className="auth-error">
+          {typeof error === "string" ? (
+            <p>{error}</p>
+          ) : (
+            error?.map((err, index) => <p key={index}>{err}</p>)
+          )}
+        </div>
+      )}
       {success && <div className="auth-success">{success}</div>}
       <input
         type="text"
