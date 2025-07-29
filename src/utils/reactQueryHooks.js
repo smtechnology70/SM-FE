@@ -28,6 +28,7 @@ export const useApiQuery = ({ url, params, interval = false, ...options }) => {
     queryKey: [url, params],
     queryFn: fetcher,
     refetchInterval: interval,
+    retry: 2,
     ...options,
   });
 };

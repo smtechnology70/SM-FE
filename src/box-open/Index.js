@@ -20,6 +20,7 @@ export default function OnlineGame() {
   const [matchmakingStatus, setMatchmakingStatus] = useState(null);
   const [matchFound, setMatchFound] = useState(false);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+  const [errors, setErrors] = useState(null);
 
   // Fetch player ID from backend
   useEffect(() => {
@@ -45,16 +46,26 @@ export default function OnlineGame() {
 
     // Listen for game state updates
     conn.on("State", (s) => {
+      console.log("Received state:", s);
       setState(s);
     });
     // Listen for matchmaking status
     conn.on("MatchmakingStatus", (status) => {
-      console.log(status);
-      
+      console.log("Matchmaking status:", status);
       setMatchmakingStatus(status);
+    });
+    conn.on("InsufficientFunds", (status) => {
+      console.log("Insufficient funds:", status);
+      setErrors(status || "An error occurred");
+    });
+    conn.on("Error", (status) => {
+      console.log("Error:", status);
+      setMatchmakingStatus(null);
+      setErrors(status || "An error occurred");
     });
     // Listen for match found
     conn.on("MatchFound", (gameInfo) => {
+      console.log("Match found:", gameInfo);
       setMatchFound(true);
       setMatchmakingStatus(null);
       setOpponentDisconnected(false);
@@ -99,14 +110,20 @@ export default function OnlineGame() {
   if (!matchFound) {
     return (
       <div className="app">
-        <h3>Matchmaking…</h3>
-        {matchmakingStatus ? (
-          <p>
-            {matchmakingStatus.message ||
-              `In queue… Position: ${matchmakingStatus.position || "?"}`}
-          </p>
+        {errors ? (
+          <p className="error">{errors}</p>
         ) : (
-          <p>Joining matchmaking queue…</p>
+          <>
+            <h3>Matchmaking…</h3>
+            {matchmakingStatus ? (
+              <p>
+                {matchmakingStatus.message ||
+                  `In queue…  ${matchmakingStatus || "?"}`}
+              </p>
+            ) : (
+              <p>Joining matchmaking queue…</p>
+            )}
+          </>
         )}
       </div>
     );
