@@ -1,4 +1,5 @@
 import "./App.css";
+import React, { useEffect, useState } from "react";
 import ZeroBlast from "./box-open/Index";
 import SingleBox from "./single-open/Index";
 import { Ludo } from "./ludo/containers/Ludo/Container";
@@ -11,8 +12,21 @@ import DailyLottery from "./lottery/DailyLottery";
 import DailyDigitGame from "./minimumNumberCount/DailyDigitGame";
 // import Header from "./lottery/Header";
 import Dashboard from "./components/Dashboard"
+import SplashScreen from "./auth/Splashscreen/SplashScreen";
 
 function App() {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
+
   return (
     <Routes>
       {/* Public Routes */}

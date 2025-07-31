@@ -30,32 +30,34 @@ export default function Login() {
   };
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2 className="auth-title">Login</h2>
-      {error && <div className="auth-error">{error}</div>}
-      <input
-        type="text"
-        placeholder="Username"
-        className="auth-input"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="auth-input"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit" className="auth-button">
-        Login
-      </button>
-      <p className="auth-switch">
-        Don't have an account?{" "}
-        <span onClick={() => navigate("/register")}>Register</span>
-      </p>
-    </form>
+    <div className="auth-container">
+      <form className="auth-box" onSubmit={handleSubmit}>
+        <h2 className="auth-title">Login</h2>
+        {error && <div className="auth-error">{error}</div>}
+        <input
+          type="text"
+          placeholder="Username"
+          className="auth-input"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="auth-input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" className="auth-button">
+          Login
+        </button>
+        <p className="auth-switch">
+          Don’t have an account?{" "}
+          <span onClick={() => navigate("/register")}>Register</span>
+        </p>
+      </form>
+    </div>
   );
 }

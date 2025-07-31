@@ -1,15 +1,15 @@
 :root {
-  --primary: #6a11cb;
-  --secondary: #2575fc;
-  --dark: #1a1a2e;
-  --darker: #16213e;
-  --light: #f0f0f0;
-  --gray: #8a8a9a;
-  --success: #43e97b;
-  --warning: #f093fb;
-  --danger: #f5576c;
-  --card-radius: 20px;
-  --transition: all 0.3s ease;
+  --dash-primary: #6a11cb;
+  --dash-secondary: #2575fc;
+  --dash-dark: #1a1a2e;
+  --dash-darker: #16213e;
+  --dash-light: #f0f0f0;
+  --dash-gray: #8a8a9a;
+  --dash-success: #43e97b;
+  --dash-warning: #f093fb;
+  --dash-danger: #f5576c;
+  --dash-card-radius: 20px;
+  --dash-transition: all 0.3s ease;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   background-color: #0f0f1b;
-  color: var(--light);
+  color: var(--dash-light);
   overflow-x: hidden;
 }
 
@@ -63,7 +63,7 @@
   padding: 0.5rem 1rem;
   border-radius: 50px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--dash-transition);
   position: relative;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .dashboard-nav-item.active {
-  background: var(--primary);
+  background: var(--dash-primary);
   box-shadow: 0 0 15px rgba(106, 17, 203, 0.5);
 }
 
@@ -95,7 +95,7 @@
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--dash-primary);
 }
 
 .dashboard-user-avatar img {
@@ -115,14 +115,14 @@
 
 .dashboard-level {
   font-size: 0.8rem;
-  color: var(--gray);
+  color: var(--dash-gray);
 }
 
 .dashboard-user-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  background: var(--darker);
+  background: var(--dash-darker);
   border-radius: 10px;
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -133,7 +133,7 @@
 
 .dashboard-menu-item {
   padding: 0.8rem 1rem;
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-menu-item:hover {
@@ -188,13 +188,13 @@
 .dashboard-hero-content p {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-  color: var(--gray);
+  color: var(--dash-gray);
   max-width: 500px;
   line-height: 1.6;
 }
 
 .dashboard-cta-button {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--dash-primary), var(--dash-secondary));
   color: white;
   border: none;
   padding: 0.8rem 2rem;
@@ -203,7 +203,7 @@
   border-radius: 50px;
   cursor: pointer;
   box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-cta-button:hover {
@@ -300,7 +300,7 @@
 }
 
 .dashboard-game-card {
-  border-radius: var(--card-radius);
+  border-radius: var(--dash-card-radius);
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -310,7 +310,7 @@
   flex-direction: column;
   justify-content: space-between;
   box-shadow: var(--shadow);
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-game-icon {
@@ -356,8 +356,8 @@
 }
 
 .dashboard-achievement-card {
-  background: var(--darker);
-  border-radius: var(--card-radius);
+  background: var(--dash-darker);
+  border-radius: var(--dash-card-radius);
   padding: 1.5rem;
   display: flex;
   gap: 1rem;
@@ -388,7 +388,7 @@
 .dashboard-back-button {
   background: none;
   border: none;
-  color: var(--light);
+  color: var(--dash-light);
   font-size: 1rem;
   cursor: pointer;
   display: flex;
@@ -396,7 +396,7 @@
   gap: 5px;
   padding: 0.5rem 1rem;
   border-radius: 50px;
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-back-button:hover {
@@ -404,8 +404,8 @@
 }
 
 .dashboard-game-container {
-  background: var(--darker);
-  border-radius: var(--card-radius);
+  background: var(--dash-darker);
+  border-radius: var(--dash-card-radius);
   min-height: 70vh;
   box-shadow: var(--shadow);
   display: flex;
@@ -434,24 +434,24 @@
 .dashboard-pulse-dot {
   width: 15px;
   height: 15px;
-  background: var(--primary);
+  background: var(--dash-primary);
   border-radius: 50%;
   animation: pulse-dot 1.5s infinite;
 }
 
 .dashboard-pulse-dot:nth-child(2) {
   animation-delay: 0.2s;
-  background: var(--secondary);
+  background: var(--dash-secondary);
 }
 
 .dashboard-pulse-dot:nth-child(3) {
   animation-delay: 0.4s;
-  background: var(--success);
+  background: var(--dash-success);
 }
 
 /* Footer */
 .dashboard-footer {
-  background: var(--darker);
+  background: var(--dash-darker);
   padding: 2rem 5%;
   margin-top: auto;
 }
@@ -479,13 +479,13 @@
 }
 
 .dashboard-footer-links a {
-  color: var(--gray);
+  color: var(--dash-gray);
   text-decoration: none;
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-footer-links a:hover {
-  color: var(--light);
+  color: var(--dash-light);
 }
 
 .dashboard-social-links {
@@ -502,11 +502,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
+  transition: var(--dash-transition);
 }
 
 .dashboard-social-icon:hover {
-  background: var(--primary);
+  background: var(--dash-primary);
   transform: translateY(-3px);
 }
 
@@ -514,7 +514,7 @@
   text-align: center;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--gray);
+  color: var(--dash-gray);
   font-size: 0.9rem;
 }
 

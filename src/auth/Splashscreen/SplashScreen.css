@@ -1,0 +1,47 @@
+.splash-container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #0f1121;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .splash-box {
+    background: radial-gradient(ellipse at center, #0f1121, #0c0e1a);
+    border-radius: 12px;
+    padding: 15vw;
+    box-shadow: 0 0 60px rgba(0, 128, 255, 0.3);
+    border: 2px solid transparent;
+    animation: borderGlow 3s infinite alternate;
+    text-align: center;
+  }
+  
+  @keyframes borderGlow {
+    from {
+      border-color: #00c6ff;
+      box-shadow: 0 0 20px #00c6ff;
+    }
+    to {
+      border-color: #7f00ff;
+      box-shadow: 0 0 40px #7f00ff;
+    }
+  }
+  
+  .splash-logo {
+    width: 180px;
+    margin-bottom: 20px;
+  }
+  
+  .splash-title {
+    color: white;
+    font-size: 2rem;
+    margin: 0;
+  }
+  
+  .splash-loading {
+    color: #aaa;
+    margin-top: 15px;
+    font-size: 1rem;
+  }
+  
