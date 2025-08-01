@@ -20,10 +20,15 @@ class SingleGameService {
       refreshTokenIfNeeded();
 
       this.connection = new signalR.HubConnectionBuilder()
-        .withUrl(`${WS_BASE_URL}/single-number-game`, {
-          withCredentials: true,
-          accessTokenFactory: getAccessToken,
-        })
+        .withUrl(
+          `${
+            process.env.REACT_APP_WS_BASE_URL || WS_BASE_URL
+          }/single-number-game`,
+          {
+            withCredentials: true,
+            accessTokenFactory: getAccessToken,
+          }
+        )
         .withAutomaticReconnect()
         .build();
 
